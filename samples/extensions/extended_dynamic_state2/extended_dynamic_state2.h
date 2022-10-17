@@ -35,11 +35,10 @@ class extended_dynamic_state2 : public ApiVulkanSample
 		float     modelscale = 0.15f;
 	} ubo_vs;
 
-
 	VkPipelineLayout                                   pipeline_layout{VK_NULL_HANDLE};
 	VkPipeline                                         model_pipeline{VK_NULL_HANDLE};
 	VkPipeline                                         skybox_pipeline{VK_NULL_HANDLE};
-	VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT vertex_input_features{};
+	VkPhysicalDeviceExtendedDynamicState2FeaturesEXT   extended_dynamic_state2_features{};
 	VkPhysicalDeviceGraphicsPipelineLibraryFeaturesEXT graphics_pipeline_library{};
 	VkVertexInputBindingDescription2EXT                vertex_bindings_description_ext{};
 	VkVertexInputAttributeDescription2EXT              vertex_attribute_description_ext[2]{};
@@ -70,6 +69,13 @@ class extended_dynamic_state2 : public ApiVulkanSample
 	void setup_descriptor_set_layout();
 	void create_descriptor_sets();
 
+#if VK_NO_PROTOTYPES
+	PFN_vkCmdSetDepthBiasEnableEXT         vkCmdSetDepthBiasEnableEXT{VK_NULL_HANDLE};
+	PFN_vkCmdSetLogicOpEXT                 vkCmdSetLogicOpEXT{VK_NULL_HANDLE};
+	PFN_vkCmdSetPatchControlPointsEXT      vkCmdSetPatchControlPointsEXT{VK_NULL_HANDLE};
+	PFN_vkCmdSetPrimitiveRestartEnableEXT  vkCmdSetPrimitiveRestartEnableEXT{VK_NULL_HANDLE};
+	PFN_vkCmdSetRasterizerDiscardEnableEXT vkCmdSetRasterizerDiscardEnableEXT{VK_NULL_HANDLE};
+#endif
 };
 
 std::unique_ptr<vkb::VulkanSample> create_extended_dynamic_state2();

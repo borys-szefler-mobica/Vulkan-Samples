@@ -17,10 +17,12 @@
 
 #include "extended_dynamic_state2.h"
 
-
 extended_dynamic_state2::extended_dynamic_state2()
 {
 	title = "Extended Dynamic State2";
+
+	add_instance_extension(VK_KHR_GET_PHYSICAL_DEVICE_PROPERTIES_2_EXTENSION_NAME);
+	add_device_extension(VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME);
 }
 
 extended_dynamic_state2::~extended_dynamic_state2()
@@ -41,7 +43,6 @@ extended_dynamic_state2::~extended_dynamic_state2()
 	}
 }
 
-
 /**
  * 	@fn bool extended_dynamic_state2::prepare(vkb::Platform &platform)
  * 	@brief Configuring all sample specific settings, creating descriptor sets/pool, pipelines, generating or loading models etc. 
@@ -53,21 +54,43 @@ bool extended_dynamic_state2::prepare(vkb::Platform &platform)
 		return false;
 	}
 
-// #if VK_NO_PROTOTYPES
-// 	VkInstance instance = get_device().get_gpu().get_instance().get_handle();
-// 	assert(!!instance);
-// 	vkCmdSetVertexInputEXT = (PFN_vkCmdSetVertexInputEXT) vkGetInstanceProcAddr(instance, "vkCmdSetVertexInputEXT");
-// 	if (!vkCmdSetVertexInputEXT)
-// 	{
-// 		throw std::runtime_error("Unable to dynamically load vkCmdSetVertexInputEXT");
-// 	}
-// #endif
+#if VK_NO_PROTOTYPES
+	VkInstance instance = get_device().get_gpu().get_instance().get_handle();
+	assert(!!instance);
+	vkCmdSetDepthBiasEnableEXT         = (PFN_vkCmdSetDepthBiasEnableEXT) vkGetInstanceProcAddr(instance, "vkCmdSetDepthBiasEnableEXT");
+	vkCmdSetLogicOpEXT                 = (PFN_vkCmdSetLogicOpEXT) vkGetInstanceProcAddr(instance, "vkCmdSetLogicOpEXT");
+	vkCmdSetPatchControlPointsEXT      = (PFN_vkCmdSetPatchControlPointsEXT) vkGetInstanceProcAddr(instance, "vkCmdSetPatchControlPointsEXT");
+	vkCmdSetPrimitiveRestartEnableEXT  = (PFN_vkCmdSetPrimitiveRestartEnableEXT) vkGetInstanceProcAddr(instance, "vkCmdSetPrimitiveRestartEnableEXT");
+	vkCmdSetRasterizerDiscardEnableEXT = (PFN_vkCmdSetRasterizerDiscardEnableEXT) vkGetInstanceProcAddr(instance, "vkCmdSetRasterizerDiscardEnableEXT");
+	if (!vkCmdSetDepthBiasEnableEXT)
+	{
+		throw std::runtime_error("Unable to dynamically load vkCmdSetDepthBiasEnableEXT");
+	}
+	if (!vkCmdSetLogicOpEXT)
+	{
+		throw std::runtime_error("Unable to dynamically load vkCmdSetLogicOpEXT");
+	}
+	if (!vkCmdSetPatchControlPointsEXT)
+	{
+		throw std::runtime_error("Unable to dynamically load vkCmdSetPatchControlPointsEXT");
+	}
+	if (!vkCmdSetPrimitiveRestartEnableEXT)
+	{
+		throw std::runtime_error("Unable to dynamically load vkCmdSetPrimitiveRestartEnableEXT");
+	}
+	if (!vkCmdSetRasterizerDiscardEnableEXT)
+	{
+		throw std::runtime_error("Unable to dynamically load vkCmdSetRasterizerDiscardEnableEXT");
+	}
+	/* TODO: make it better later */
 
-// 	vertex_input_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_INPUT_DYNAMIC_STATE_FEATURES_EXT;
-// 	VkPhysicalDeviceFeatures2 device_features{};
-// 	device_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-// 	device_features.pNext = &vertex_input_features;
-// 	vkGetPhysicalDeviceFeatures2(get_device().get_gpu().get_handle(), &device_features);
+#endif
+
+	extended_dynamic_state2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT;
+	VkPhysicalDeviceFeatures2 device_features{};
+	device_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+	device_features.pNext = &extended_dynamic_state2_features;
+	vkGetPhysicalDeviceFeatures2(get_device().get_gpu().get_handle(), &device_features);
 
 	camera.type = vkb::CameraType::LookAt;
 	camera.set_position({0.f, 0.f, -4.0f});
@@ -239,7 +262,6 @@ void extended_dynamic_state2::create_pipeline()
 	vertex_input_state.pVertexBindingDescriptions           = vertex_input_bindings.data();
 	vertex_input_state.vertexAttributeDescriptionCount      = static_cast<uint32_t>(vertex_input_attributes.size());
 	vertex_input_state.pVertexAttributeDescriptions         = vertex_input_attributes.data();
-
 
 	std::array<VkPipelineShaderStageCreateInfo, 2> shader_stages{};
 	shader_stages[0] = load_shader("vertex_dynamic_state/gbuffer.vert", VK_SHADER_STAGE_VERTEX_BIT);
@@ -440,8 +462,10 @@ void extended_dynamic_state2::request_gpu_features(vkb::PhysicalDevice &gpu)
 {
 	/* Enable extension features required by this sample
 	   These are passed to device creation via a pNext structure chain */
-	auto &requested_vertex_input_features                   = gpu.request_extension_features<VkPhysicalDeviceVertexInputDynamicStateFeaturesEXT>(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VERTEX_INPUT_DYNAMIC_STATE_FEATURES_EXT);
-	requested_vertex_input_features.vertexInputDynamicState = VK_TRUE;
+	auto &requested_extended_dynamic_state2_features                                   = gpu.request_extension_features<VkPhysicalDeviceExtendedDynamicState2FeaturesEXT>(VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT);
+	requested_extended_dynamic_state2_features.extendedDynamicState2                   = VK_TRUE;
+	requested_extended_dynamic_state2_features.extendedDynamicState2LogicOp            = VK_TRUE;
+	requested_extended_dynamic_state2_features.extendedDynamicState2PatchControlPoints = VK_TRUE;
 
 	if (gpu.get_features().samplerAnisotropy)
 	{

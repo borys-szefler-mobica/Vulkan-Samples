@@ -16,6 +16,7 @@
 #
 
 cmake_minimum_required(VERSION 3.16)
+set(VKB_VALIDATION_LAYERS ON)
 
 project(vulkan_samples)
 
