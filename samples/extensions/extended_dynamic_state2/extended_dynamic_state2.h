@@ -22,6 +22,35 @@
 class extended_dynamic_state2 : public ApiVulkanSample
 {
   public:
+
+	struct 
+	{
+		bool depth_bias_enable = true;
+		bool primitive_restart_enable = true;
+		bool rasterizer_discard_enable = true;
+		int32_t logic_op_index{};
+		VkLogicOp logicOp = VK_LOGIC_OP_CLEAR;
+		float patch_control_points_float{};
+		uint32_t patch_control_points{};
+	}gui_settings;
+
+	std::vector<std::string> logic_op_object_names{"CLEAR",
+												   "AND",
+												   "AND_REVERSE",
+												   "COPY",
+												   "AND_INVERTED",
+												   "NO_OP",
+												   "XOR",
+												   "OR",
+												   "NOR",
+												   "EQUIVALENT",
+												   "INVERT",
+												   "OR_REVERSE",
+												   "COPY_INVERTED",
+												   "OR_INVERTED",
+												   "NAND",
+												   "SET"};
+
 	struct
 	{
 		Texture envmap;
@@ -58,6 +87,7 @@ class extended_dynamic_state2 : public ApiVulkanSample
 	virtual void build_command_buffers() override;
 	virtual bool prepare(vkb::Platform &platform) override;
 	virtual void request_gpu_features(vkb::PhysicalDevice &gpu) override;
+	virtual void on_update_ui_overlay(vkb::Drawer &drawer) override;
 
 	void prepare_uniform_buffers();
 	void update_uniform_buffers();

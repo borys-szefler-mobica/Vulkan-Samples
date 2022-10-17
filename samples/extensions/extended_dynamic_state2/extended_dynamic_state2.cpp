@@ -473,6 +473,49 @@ void extended_dynamic_state2::request_gpu_features(vkb::PhysicalDevice &gpu)
 	}
 }
 
+void extended_dynamic_state2::on_update_ui_overlay(vkb::Drawer &drawer)
+{
+	if (drawer.header("Settings"))
+	{
+		
+		if (drawer.checkbox("Depth Bias Enable", &gui_settings.depth_bias_enable))
+		{
+			update_uniform_buffers();
+		}
+		if (drawer.checkbox("Primitive Restart Enable", &gui_settings.primitive_restart_enable))
+		{
+			update_uniform_buffers();
+		}
+		if (drawer.checkbox("Rasterizer Discard Enable", &gui_settings.rasterizer_discard_enable))
+		{
+			update_uniform_buffers();
+		}
+		if (drawer.combo_box("Logic type", &gui_settings.logic_op_index, logic_op_object_names))
+		{
+			gui_settings.logicOp = (VkLogicOp) gui_settings.logic_op_index;
+			update_uniform_buffers();
+			build_command_buffers();
+		}
+		if (drawer.input_float("Patch Control Points", &gui_settings.patch_control_points_float, 1.0f, 1))
+		{
+			gui_settings.patch_control_points = (uint32_t) roundf(gui_settings.patch_control_points_float);
+		}
+
+		// if (drawer.input_float("Factor", &ubo_tess.tessellation_factor, 0.05f, 2))
+		// {
+		// 	update_uniform_buffers();
+		// }
+		// if (get_device().get_gpu().get_features().fillModeNonSolid)
+		// {
+		// 	if (drawer.checkbox("Wireframe", &wireframe))
+		// 	{
+		// 		build_command_buffers();
+		// 	}
+		// }
+	}
+
+}
+
 std::unique_ptr<vkb::VulkanSample> create_extended_dynamic_state2()
 {
 	return std::make_unique<extended_dynamic_state2>();
