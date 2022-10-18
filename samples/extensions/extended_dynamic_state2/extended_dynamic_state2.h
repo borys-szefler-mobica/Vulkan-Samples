@@ -19,15 +19,15 @@
 
 #include "api_vulkan_sample.h"
 
-class extended_dynamic_state2 : public ApiVulkanSample
+class ExtendedDynamicState2 : public ApiVulkanSample
 {
   public:
 
 	struct 
 	{
-		bool depth_bias_enable = true;
-		bool primitive_restart_enable = true;
-		bool rasterizer_discard_enable = true;
+		bool depth_bias_enable = false;
+		bool primitive_restart_enable = false;
+		bool rasterizer_discard_enable = false;
 		int32_t logic_op_index{};
 		VkLogicOp logicOp = VK_LOGIC_OP_CLEAR;
 		float patch_control_points_float{};
@@ -80,8 +80,8 @@ class extended_dynamic_state2 : public ApiVulkanSample
 	std::unique_ptr<vkb::sg::SubMesh>  object;
 	std::unique_ptr<vkb::core::Buffer> ubo;
 
-	extended_dynamic_state2();
-	~extended_dynamic_state2();
+	ExtendedDynamicState2();
+	~ExtendedDynamicState2();
 
 	virtual void render(float delta_time) override;
 	virtual void build_command_buffers() override;
@@ -106,6 +106,7 @@ class extended_dynamic_state2 : public ApiVulkanSample
 	PFN_vkCmdSetPrimitiveRestartEnableEXT  vkCmdSetPrimitiveRestartEnableEXT{VK_NULL_HANDLE};
 	PFN_vkCmdSetRasterizerDiscardEnableEXT vkCmdSetRasterizerDiscardEnableEXT{VK_NULL_HANDLE};
 #endif
+
 };
 
 std::unique_ptr<vkb::VulkanSample> create_extended_dynamic_state2();

@@ -17,7 +17,7 @@
 
 #include "extended_dynamic_state2.h"
 
-extended_dynamic_state2::extended_dynamic_state2()
+ExtendedDynamicState2::ExtendedDynamicState2()
 {
 	title = "Extended Dynamic State2";
 
@@ -25,7 +25,7 @@ extended_dynamic_state2::extended_dynamic_state2()
 	add_device_extension(VK_EXT_EXTENDED_DYNAMIC_STATE_2_EXTENSION_NAME);
 }
 
-extended_dynamic_state2::~extended_dynamic_state2()
+ExtendedDynamicState2::~ExtendedDynamicState2()
 {
 	if (device)
 	{
@@ -44,10 +44,10 @@ extended_dynamic_state2::~extended_dynamic_state2()
 }
 
 /**
- * 	@fn bool extended_dynamic_state2::prepare(vkb::Platform &platform)
+ * 	@fn bool ExtendedDynamicState2::prepare(vkb::Platform &platform)
  * 	@brief Configuring all sample specific settings, creating descriptor sets/pool, pipelines, generating or loading models etc. 
 */
-bool extended_dynamic_state2::prepare(vkb::Platform &platform)
+bool ExtendedDynamicState2::prepare(vkb::Platform &platform)
 {
 	if (!ApiVulkanSample::prepare(platform))
 	{
@@ -109,10 +109,10 @@ bool extended_dynamic_state2::prepare(vkb::Platform &platform)
 	return true;
 }
 /**
- * 	@fn void extended_dynamic_state2::load_assets()
+ * 	@fn void ExtendedDynamicState2::load_assets()
  *	@brief Loading extra models, textures from assets 
  */
-void extended_dynamic_state2::load_assets()
+void ExtendedDynamicState2::load_assets()
 {
 	/* Models */
 	skybox = load_model("scenes/cube.gltf");
@@ -123,10 +123,10 @@ void extended_dynamic_state2::load_assets()
 }
 
 /**
- * 	@fn void extended_dynamic_state2::draw()
+ * 	@fn void ExtendedDynamicState2::draw()
  *  @brief Preparing frame and submitting it to the present queue
  */
-void extended_dynamic_state2::draw()
+void ExtendedDynamicState2::draw()
 {
 	ApiVulkanSample::prepare_frame();
 	submit_info.commandBufferCount = 1;
@@ -136,10 +136,10 @@ void extended_dynamic_state2::draw()
 }
 
 /**
- * 	@fn void extended_dynamic_state2::render(float delta_time)
+ * 	@fn void ExtendedDynamicState2::render(float delta_time)
  * 	@brief Drawing frames and/or updating uniform buffers when camera position/rotation was changed
 */
-void extended_dynamic_state2::render(float delta_time)
+void ExtendedDynamicState2::render(float delta_time)
 {
 	if (!prepared)
 		return;
@@ -149,10 +149,10 @@ void extended_dynamic_state2::render(float delta_time)
 }
 
 /**
- * 	@fn void extended_dynamic_state2::prepare_uniform_buffers()
+ * 	@fn void ExtendedDynamicState2::prepare_uniform_buffers()
  * 	@brief Preparing uniform buffer (setting bits) and updating UB data
  */
-void extended_dynamic_state2::prepare_uniform_buffers()
+void ExtendedDynamicState2::prepare_uniform_buffers()
 {
 	ubo = std::make_unique<vkb::core::Buffer>(get_device(), sizeof(ubo_vs), VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VMA_MEMORY_USAGE_CPU_TO_GPU);
 
@@ -160,10 +160,10 @@ void extended_dynamic_state2::prepare_uniform_buffers()
 }
 
 /**
- * 	@fn void extended_dynamic_state2::update_uniform_buffers()
+ * 	@fn void ExtendedDynamicState2::update_uniform_buffers()
  * 	@brief Updating data from application to GPU uniform buffer
  */
-void extended_dynamic_state2::update_uniform_buffers()
+void ExtendedDynamicState2::update_uniform_buffers()
 {
 	ubo_vs.projection       = camera.matrices.perspective;
 	ubo_vs.modelview        = camera.matrices.view * glm::mat4(1.f);
@@ -172,7 +172,7 @@ void extended_dynamic_state2::update_uniform_buffers()
 }
 
 /**
- * 	@fn void extended_dynamic_state2::create_pipeline()
+ * 	@fn void ExtendedDynamicState2::create_pipeline()
  * 	@brief Creating graphical pipeline
  * 	@details Preparing pipeline structures:
  * 			 - VkPipelineInputAssemblyStateCreateInfo
@@ -192,7 +192,7 @@ void extended_dynamic_state2::update_uniform_buffers()
  * 			 - In VkGraphicsPipelineCreateInfo "pVertexInputState" element is not require to declare (when using vertex input dynamic state)
  * 
  */
-void extended_dynamic_state2::create_pipeline()
+void ExtendedDynamicState2::create_pipeline()
 {
 	VkPipelineInputAssemblyStateCreateInfo input_assembly_state =
 	    vkb::initializers::pipeline_input_assembly_state_create_info(
@@ -238,7 +238,8 @@ void extended_dynamic_state2::create_pipeline()
 
 	std::vector<VkDynamicState> dynamic_state_enables = {
 	    VK_DYNAMIC_STATE_VIEWPORT,
-	    VK_DYNAMIC_STATE_SCISSOR};
+	    VK_DYNAMIC_STATE_SCISSOR,
+	    VK_DYNAMIC_STATE_DEPTH_BIAS_ENABLE_EXT};
 	VkPipelineDynamicStateCreateInfo dynamic_state =
 	    vkb::initializers::pipeline_dynamic_state_create_info(
 	        dynamic_state_enables.data(),
@@ -319,7 +320,7 @@ void extended_dynamic_state2::create_pipeline()
 }
 
 /**
- * 	@fn void extended_dynamic_state2::build_command_buffers()
+ * 	@fn void ExtendedDynamicState2::build_command_buffers()
  * 	@brief Creating command buffers and drawing particular elements on window.
  * 	@details Drawing object list:
  * 			 - Skybox - cube that have background texture attached (easy way to generate background to scene).
@@ -331,7 +332,7 @@ void extended_dynamic_state2::create_pipeline()
  * 		  By default function "load_model" from framework is parsing data from .gltf files and build it every time in declared structure (see Vertex structure in framework files).
  * 		  Before drawing different models (in case of vertex input data structure) "change_vertex_input_data" fuction is call for dynamically change Vertex Input data.
  */
-void extended_dynamic_state2::build_command_buffers()
+void ExtendedDynamicState2::build_command_buffers()
 {
 	std::array<VkClearValue, 2> clear_values{};
 	clear_values[0].color        = {{0.0f, 0.0f, 0.0f, 0.0f}};
@@ -360,6 +361,7 @@ void extended_dynamic_state2::build_command_buffers()
 
 			/* object */
 			vkCmdBindPipeline(draw_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, model_pipeline);
+
 			draw_model(object, draw_cmd_buffer);
 
 			/* UI */
@@ -395,10 +397,10 @@ void extended_dynamic_state2::build_command_buffers()
 }
 
 /**
- * 	@fn void extended_dynamic_state2::create_descriptor_pool()
+ * 	@fn void ExtendedDynamicState2::create_descriptor_pool()
  * 	@brief Creating descriptor pool with size adjusted to use uniform buffer and image sampler
 */
-void extended_dynamic_state2::create_descriptor_pool()
+void ExtendedDynamicState2::create_descriptor_pool()
 {
 	std::vector<VkDescriptorPoolSize> pool_sizes = {
 	    vkb::initializers::descriptor_pool_size(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 2),
@@ -410,10 +412,10 @@ void extended_dynamic_state2::create_descriptor_pool()
 }
 
 /**
- * 	@fn void extended_dynamic_state2::setup_descriptor_set_layout()
+ * 	@fn void ExtendedDynamicState2::setup_descriptor_set_layout()
  * 	@brief Creating layout for descriptor sets
 */
-void extended_dynamic_state2::setup_descriptor_set_layout()
+void ExtendedDynamicState2::setup_descriptor_set_layout()
 {
 	std::vector<VkDescriptorSetLayoutBinding> set_layout_bindings = {
 	    vkb::initializers::descriptor_set_layout_binding(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT, 0),
@@ -434,12 +436,12 @@ void extended_dynamic_state2::setup_descriptor_set_layout()
 }
 
 /**
- * 	@fn void extended_dynamic_state2::create_descriptor_sets()
+ * 	@fn void ExtendedDynamicState2::create_descriptor_sets()
  * 	@brief Creating both descriptor set:
  * 		   1. Uniform buffer
  * 		   2. Image sampler
 */
-void extended_dynamic_state2::create_descriptor_sets()
+void ExtendedDynamicState2::create_descriptor_sets()
 {
 	VkDescriptorSetAllocateInfo alloc_info =
 	    vkb::initializers::descriptor_set_allocate_info(
@@ -458,7 +460,7 @@ void extended_dynamic_state2::create_descriptor_sets()
 	vkUpdateDescriptorSets(get_device().get_handle(), static_cast<uint32_t>(write_descriptor_sets.size()), write_descriptor_sets.data(), 0, nullptr);
 }
 
-void extended_dynamic_state2::request_gpu_features(vkb::PhysicalDevice &gpu)
+void ExtendedDynamicState2::request_gpu_features(vkb::PhysicalDevice &gpu)
 {
 	/* Enable extension features required by this sample
 	   These are passed to device creation via a pNext structure chain */
@@ -473,11 +475,10 @@ void extended_dynamic_state2::request_gpu_features(vkb::PhysicalDevice &gpu)
 	}
 }
 
-void extended_dynamic_state2::on_update_ui_overlay(vkb::Drawer &drawer)
+void ExtendedDynamicState2::on_update_ui_overlay(vkb::Drawer &drawer)
 {
 	if (drawer.header("Settings"))
 	{
-		
 		if (drawer.checkbox("Depth Bias Enable", &gui_settings.depth_bias_enable))
 		{
 			update_uniform_buffers();
@@ -500,23 +501,10 @@ void extended_dynamic_state2::on_update_ui_overlay(vkb::Drawer &drawer)
 		{
 			gui_settings.patch_control_points = (uint32_t) roundf(gui_settings.patch_control_points_float);
 		}
-
-		// if (drawer.input_float("Factor", &ubo_tess.tessellation_factor, 0.05f, 2))
-		// {
-		// 	update_uniform_buffers();
-		// }
-		// if (get_device().get_gpu().get_features().fillModeNonSolid)
-		// {
-		// 	if (drawer.checkbox("Wireframe", &wireframe))
-		// 	{
-		// 		build_command_buffers();
-		// 	}
-		// }
 	}
-
 }
 
 std::unique_ptr<vkb::VulkanSample> create_extended_dynamic_state2()
 {
-	return std::make_unique<extended_dynamic_state2>();
+	return std::make_unique<ExtendedDynamicState2>();
 }
