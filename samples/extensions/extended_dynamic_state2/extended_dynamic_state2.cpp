@@ -87,10 +87,10 @@ bool ExtendedDynamicState2::prepare(vkb::Platform &platform)
 #endif
 
 	extended_dynamic_state2_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_EXTENDED_DYNAMIC_STATE_2_FEATURES_EXT;
-	VkPhysicalDeviceFeatures2 device_features{};
-	device_features.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
-	device_features.pNext = &extended_dynamic_state2_features;
-	vkGetPhysicalDeviceFeatures2(get_device().get_gpu().get_handle(), &device_features);
+	VkPhysicalDeviceFeatures2 device_features2{};
+	device_features2.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2;
+	device_features2.pNext = &extended_dynamic_state2_features;
+	vkGetPhysicalDeviceFeatures2(get_device().get_gpu().get_handle(), &device_features2);
 
 	camera.type = vkb::CameraType::LookAt;
 	camera.set_position({0.f, 0.f, -4.0f});
@@ -212,14 +212,16 @@ void ExtendedDynamicState2::create_pipeline()
 	        0xf,
 	        VK_FALSE);
 
-	const auto color_attachment_state = vkb::initializers::pipeline_color_blend_attachment_state(0xf, VK_FALSE);
+	blend_attachment_state.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+	blend_attachment_state.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;
 
 	VkPipelineColorBlendStateCreateInfo color_blend_state =
 	    vkb::initializers::pipeline_color_blend_state_create_info(
 	        1,
 	        &blend_attachment_state);
-	color_blend_state.attachmentCount = 1;
-	color_blend_state.pAttachments    = &color_attachment_state;
+
+	color_blend_state.logicOp       = gui_settings.logicOp;
+	color_blend_state.logicOpEnable = VK_TRUE;
 
 	/* Note: Using Reversed depth-buffer for increased precision, so Greater depth values are kept */
 	VkPipelineDepthStencilStateCreateInfo depth_stencil_state =
@@ -239,7 +241,8 @@ void ExtendedDynamicState2::create_pipeline()
 	std::vector<VkDynamicState> dynamic_state_enables = {
 	    VK_DYNAMIC_STATE_VIEWPORT,
 	    VK_DYNAMIC_STATE_SCISSOR,
-	    VK_DYNAMIC_STATE_DEPTH_BIAS_ENABLE_EXT};
+	    VK_DYNAMIC_STATE_LOGIC_OP_EXT};
+
 	VkPipelineDynamicStateCreateInfo dynamic_state =
 	    vkb::initializers::pipeline_dynamic_state_create_info(
 	        dynamic_state_enables.data(),
@@ -265,8 +268,8 @@ void ExtendedDynamicState2::create_pipeline()
 	vertex_input_state.pVertexAttributeDescriptions         = vertex_input_attributes.data();
 
 	std::array<VkPipelineShaderStageCreateInfo, 2> shader_stages{};
-	shader_stages[0] = load_shader("vertex_dynamic_state/gbuffer.vert", VK_SHADER_STAGE_VERTEX_BIT);
-	shader_stages[1] = load_shader("vertex_dynamic_state/gbuffer.frag", VK_SHADER_STAGE_FRAGMENT_BIT);
+	shader_stages[0] = load_shader("extended_dynamic_state2/gbuffer.vert", VK_SHADER_STAGE_VERTEX_BIT);
+	shader_stages[1] = load_shader("extended_dynamic_state2/gbuffer.frag", VK_SHADER_STAGE_FRAGMENT_BIT);
 
 	/* Create graphics pipeline for dynamic rendering */
 	VkFormat color_rendering_format = render_context->get_format();
@@ -355,7 +358,9 @@ void ExtendedDynamicState2::build_command_buffers()
 			/* One descriptor set is used, and the draw type is toggled by a specialization constant */
 			vkCmdBindDescriptorSets(draw_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_layout, 0, 1, &descriptor_set, 0, nullptr);
 
+			vkCmdSetLogicOpEXT(draw_cmd_buffer, gui_settings.logicOp);
 			/* skybox */
+
 			vkCmdBindPipeline(draw_cmd_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, skybox_pipeline);
 			draw_model(skybox, draw_cmd_buffer);
 
@@ -468,6 +473,11 @@ void ExtendedDynamicState2::request_gpu_features(vkb::PhysicalDevice &gpu)
 	requested_extended_dynamic_state2_features.extendedDynamicState2                   = VK_TRUE;
 	requested_extended_dynamic_state2_features.extendedDynamicState2LogicOp            = VK_TRUE;
 	requested_extended_dynamic_state2_features.extendedDynamicState2PatchControlPoints = VK_TRUE;
+
+	if (gpu.get_features().logicOp)
+	{
+		gpu.get_mutable_requested_features().logicOp = VK_TRUE;
+	}
 
 	if (gpu.get_features().samplerAnisotropy)
 	{

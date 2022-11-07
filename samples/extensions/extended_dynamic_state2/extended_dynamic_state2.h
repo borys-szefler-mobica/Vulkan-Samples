@@ -22,34 +22,33 @@
 class ExtendedDynamicState2 : public ApiVulkanSample
 {
   public:
-
-	struct 
+	struct
 	{
-		bool depth_bias_enable = false;
-		bool primitive_restart_enable = false;
-		bool rasterizer_discard_enable = false;
-		int32_t logic_op_index{};
+		bool      depth_bias_enable         = false;
+		bool      primitive_restart_enable  = false;
+		bool      rasterizer_discard_enable = false;
+		int32_t   logic_op_index{};
 		VkLogicOp logicOp = VK_LOGIC_OP_CLEAR;
-		float patch_control_points_float{};
-		uint32_t patch_control_points{};
-	}gui_settings;
+		float     patch_control_points_float{};
+		uint32_t  patch_control_points{};
+	} gui_settings;
 
 	std::vector<std::string> logic_op_object_names{"CLEAR",
-												   "AND",
-												   "AND_REVERSE",
-												   "COPY",
-												   "AND_INVERTED",
-												   "NO_OP",
-												   "XOR",
-												   "OR",
-												   "NOR",
-												   "EQUIVALENT",
-												   "INVERT",
-												   "OR_REVERSE",
-												   "COPY_INVERTED",
-												   "OR_INVERTED",
-												   "NAND",
-												   "SET"};
+	                                               "AND",
+	                                               "AND_REVERSE",
+	                                               "COPY",
+	                                               "AND_INVERTED",
+	                                               "NO_OP",
+	                                               "XOR",
+	                                               "OR",
+	                                               "NOR",
+	                                               "EQUIVALENT",
+	                                               "INVERT",
+	                                               "OR_REVERSE",
+	                                               "COPY_INVERTED",
+	                                               "OR_INVERTED",
+	                                               "NAND",
+	                                               "SET"};
 
 	struct
 	{
@@ -106,7 +105,6 @@ class ExtendedDynamicState2 : public ApiVulkanSample
 	PFN_vkCmdSetPrimitiveRestartEnableEXT  vkCmdSetPrimitiveRestartEnableEXT{VK_NULL_HANDLE};
 	PFN_vkCmdSetRasterizerDiscardEnableEXT vkCmdSetRasterizerDiscardEnableEXT{VK_NULL_HANDLE};
 #endif
-
 };
 
 std::unique_ptr<vkb::VulkanSample> create_extended_dynamic_state2();
